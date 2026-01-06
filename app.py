@@ -43,23 +43,6 @@ if "step" not in st.session_state:
 if "data" not in st.session_state:
     st.session_state.data = {}
 
-alat_list = [
-    "Pipet tetes",
-    "Gelas beaker 50 mL,
-    "Gelas beaker 50 mL, 100, 250, 500, 1000 mL)",
-    "Gelas ukur (5, 10, 50, 100 mL)",
-    "Labu takar (5, 10, 25, 50, 100 mL)",
-    "Cawan petri",
-    "Buret (Mikro, Semi-Mikro, Makro)",
-    "Kasa Asbes",
-    "Bunsen",
-    "Tabung reaksi (Biasa, Ulir)",
-    "Corong Kaca",
-    "Penjepit Kayu",
-    "Batang Pengaduk",
-    "Kaki tiga"
-]
-
 if st.session_state.step == 1:
     st.title("Form Peminjaman Alat Praktikum")
 
