@@ -1,50 +1,81 @@
 import streamlit as st
+from datetime import date
+import time
+
+# ================== KONFIGURASI HALAMAN ==================
+st.set_page_config(
+    page_title="Pengembalian Alat Praktikum",
+    layout="centered"
+)
+
+# ================== STYLE / BACKGROUND ==================
 st.markdown(
     """
     <style>
     .stApp {
-        background: linear-gradient(135deg, #667eea, #764ba2);
+        background: linear-gradient(135deg, #ff758c, #ff7eb3);
     }
 
     h1, h2, h3 {
-        color: blue;
+        color: white;
+        text-align: center;
     }
 
     label {
-        color: #f1f1f1;
-        font-weight: 600;
-    }
-
-    .stButton > button {
-        background-color: #ffffff;
-        color: #764ba2;
-        border-radius: 10px;
-        height: 45px;
-        width: 100%;
+        color: white !important;
         font-weight: bold;
     }
 
-    .stButton > button:hover {
-        background-color: #f1f1f1;
-        color: #667eea;
+    .card {
+        background-color: rgba(255,255,255,0.18);
+        padding: 25px;
+        border-radius: 15px;
+        margin-bottom: 20px;
+    }
+
+    .stButton > button {
+        background-color: white;
+        color: #ff758c;
+        border-radius: 10px;
+        height: 45px;
+        width: 100%;
+        font-size: 16px;
+        font-weight: bold;
     }
     </style>
     """,
     unsafe_allow_html=True
 )
-from datetime import date
-import time
 
-st.set_page_config(page_title= "Pengembalian Alat Praktikum")
-colour:grey;
-
+# ================== SESSION STATE ==================
 if "step" not in st.session_state:
     st.session_state.step = 1
+
 if "data" not in st.session_state:
     st.session_state.data = {}
 
+# ================== DAFTAR ALAT ==================
+alat_list = [
+    "Pipet tetes",
+    "Gelas beaker (50, 100, 250, 500, 1000 mL)",
+    "Gelas ukur (5, 10, 50, 100 mL)",
+    "Labu takar (5, 10, 25, 50, 100 mL)",
+    "Cawan petri",
+    "Buret (Mikro, Semi-Mikro, Makro)",
+    "Kasa Asbes",
+    "Bunsen",
+    "Tabung reaksi (Biasa, Ulir)",
+    "Corong kaca",
+    "Penjepit kayu",
+    "Batang pengaduk",
+    "Kaki tiga"
+]
+
+# ================== STEP 1 ==================
 if st.session_state.step == 1:
     st.title("Form Peminjaman Alat Praktikum")
+
+    st.markdown('<div class="card">', unsafe_allow_html=True)
 
     nama = st.text_input("Nama")
     kelompok = st.text_input("Kelompok")
@@ -52,12 +83,17 @@ if st.session_state.step == 1:
     judul = st.text_input("Judul Praktik")
     matkul = st.text_input("Mata Kuliah")
 
-    st.subheader("Pilih Alat")
-    alat_dipilih = [a for a in alat_list if st.checkbox(a)]
+    st.subheader("Pilih Alat yang Digunakan")
+    alat_dipilih = []
+    for alat in alat_list:
+        if st.checkbox(alat):
+            alat_dipilih.append(alat)
+
+    st.markdown('</div>', unsafe_allow_html=True)
 
     if st.button("Lanjutkan"):
-        if not all([nama, kelompok, judul, matkul, alat_dipilih]):
-            st.warning("Semua wajib diisi")
+        if not nama or not kelompok or not judul or not matkul or not alat_dipilih:
+            st.warning("⚠️ Semua data wajib diisi")
         else:
             st.session_state.data = {
                 "nama": nama,
@@ -70,35 +106,55 @@ if st.session_state.step == 1:
             st.session_state.step = 2
             st.rerun()
 
+# ================== STEP 2 ==================
 elif st.session_state.step == 2:
-    st.title("Resume")
+    st.title("Resume Konfirmasi")
 
     d = st.session_state.data
-    st.write("Nama:", d["nama"])
-    st.write("Kelompok:", d["kelompok"])
-    st.write("Judul:", d["judul"])
-    st.write("Mata Kuliah:", d["matkul"])
 
-    st.subheader("Alat Dipinjam")
+    st.markdown('<div class="card">', unsafe_allow_html=True)
+    st.write(f"**Nama:** {d['nama']}")
+    st.write(f"**Kelompok:** {d['kelompok']}")
+    st.write(f"**Tanggal:** {d['tanggal']}")
+    st.write(f"**Judul Praktik:** {d['judul']}")
+    st.write(f"**Mata Kuliah:** {d['matkul']}")
+
+    st.subheader("Alat yang Dipinjam:")
     for a in d["alat"]:
-        st.write("-", a)
+        st.write(f"- {a}")
+
+    st.markdown('</div>', unsafe_allow_html=True)
 
     if st.button("Lanjutkan"):
         st.session_state.step = 3
         st.rerun()
 
+# ================== STEP 3 ==================
 elif st.session_state.step == 3:
-    st.title("Upload Bukti Pengembalian")
-    foto = st.file_uploader("Upload foto", type=["jpg", "png", "jpeg"])
+    st.title("Bukti Dokumentasi Pengembalian Alat")
+
+    st.markdown('<div class="card">', unsafe_allow_html=True)
+
+    foto = st.file_uploader(
+        "Upload foto pengembalian alat",
+        type=["jpg", "jpeg", "png"]
+    )
 
     if foto:
-        st.image(foto)
-        if st.button("Konfirmasi"):
+        st.image(foto, use_container_width=True)
+
+        if st.button("Konfirmasi Pengembalian"):
             st.session_state.step = 4
             st.rerun()
 
+    st.markdown('</div>', unsafe_allow_html=True)
+
+# ================== STEP 4 ==================
 elif st.session_state.step == 4:
-    with st.spinner("Memproses..."):
+    st.title("Status Pengembalian")
+
+    with st.spinner("Memverifikasi pengembalian alat..."):
         time.sleep(2)
+
     st.success("✅ Pengembalian terkonfirmasi!")
     st.balloons()
