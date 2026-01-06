@@ -1,7 +1,3 @@
-import streamlit as st
-import pandas as pd
-from datetime import date
-
 st.set_page_config(page_title="Peminjaman Alat Lab", layout="wide")
 
 # ================= LOAD DATA =================
