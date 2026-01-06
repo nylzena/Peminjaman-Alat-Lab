@@ -1,4 +1,37 @@
 import streamlit as st
+st.markdown(
+    """
+    <style>
+    .stApp {
+        background: linear-gradient(135deg, #667eea, #764ba2);
+    }
+
+    h1, h2, h3 {
+        color: white;
+    }
+
+    label {
+        color: #f1f1f1;
+        font-weight: 600;
+    }
+
+    .stButton > button {
+        background-color: #ffffff;
+        color: #764ba2;
+        border-radius: 10px;
+        height: 45px;
+        width: 100%;
+        font-weight: bold;
+    }
+
+    .stButton > button:hover {
+        background-color: #f1f1f1;
+        color: #667eea;
+    }
+    </style>
+    """,
+    unsafe_allow_html=True
+)
 from datetime import date
 import time
 
