@@ -7,7 +7,7 @@ st.markdown(
     }
 
     h1, h2, h3 {
-        color: white;
+        color: blue;
     }
 
     label {
@@ -36,7 +36,7 @@ from datetime import date
 import time
 
 st.set_page_config(page_title= "Pengembalian Alat Praktikum")
-colour:brown;
+colour:grey;
 
 if "step" not in st.session_state:
     st.session_state.step = 1
