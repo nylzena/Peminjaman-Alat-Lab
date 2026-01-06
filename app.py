@@ -2,7 +2,8 @@ import streamlit as st
 from datetime import date
 import time
 
-st.set_page_config(page_title=brown "Pengembalian Alat Praktikum")
+st.set_page_config(page_title= "Pengembalian Alat Praktikum")
+colour:brown;
 
 if "step" not in st.session_state:
     st.session_state.step = 1
