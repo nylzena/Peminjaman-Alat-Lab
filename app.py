@@ -2,7 +2,7 @@ import streamlit as st
 from datetime import date
 import time
 
-st.set_page_config(page_title="Pengembalian Alat Praktikum")
+st.set_page_config(page_title=brown "Pengembalian Alat Praktikum")
 
 if "step" not in st.session_state:
     st.session_state.step = 1
@@ -11,7 +11,8 @@ if "data" not in st.session_state:
 
 alat_list = [
     "Pipet tetes",
-    "Gelas beaker (50, 100, 250, 500, 1000 mL)",
+    "Gelas beaker 50 mL,
+    "Gelas beaker 50 mL, 100, 250, 500, 1000 mL)",
     "Gelas ukur (5, 10, 50, 100 mL)",
     "Labu takar (5, 10, 25, 50, 100 mL)",
     "Cawan petri",
