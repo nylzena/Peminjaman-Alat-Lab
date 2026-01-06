@@ -1,76 +1,86 @@
-st.set_page_config(page_title="Peminjaman Alat Lab", layout="wide")
+import streamlit as st
+from datetime import date
+import time
 
-# ================= LOAD DATA =================
-alat = pd.read_csv("data/alat.csv")
-peminjaman = pd.read_csv("data/peminjaman.csv")
+st.set_page_config(page_title="Pengembalian Alat Praktikum")
 
-# ================= SIDEBAR =================
-st.sidebar.title("🔐 Login")
+if "step" not in st.session_state:
+    st.session_state.step = 1
+if "data" not in st.session_state:
+    st.session_state.data = {}
 
-role = st.sidebar.radio("Masuk sebagai:", ["User", "Admin"])
-admin_password = "admin123"
+alat_list = [
+    "Pipet tetes",
+    "Gelas beaker (50, 100, 250, 500, 1000 mL)",
+    "Gelas ukur (5, 10, 50, 100 mL)",
+    "Labu takar (5, 10, 25, 50, 100 mL)",
+    "Cawan petri",
+    "Buret (Mikro, Semi-Mikro, Makro)",
+    "Kasa Asbes",
+    "Bunsen",
+    "Tabung reaksi (Biasa, Ulir)",
+    "Corong Kaca",
+    "Penjepit Kayu",
+    "Batang Pengaduk",
+    "Kaki tiga"
+]
 
-if role == "Admin":
-    password = st.sidebar.text_input("Password Admin", type="password")
-    if password != admin_password:
-        st.warning("Password salah")
-        st.stop()
+if st.session_state.step == 1:
+    st.title("Form Peminjaman Alat Praktikum")
 
-menu = st.sidebar.selectbox(
-    "Menu",
-    ["🏠 Daftar Alat", "📝 Pinjam Alat", "📊 Data Peminjaman"]
-)
+    nama = st.text_input("Nama")
+    kelompok = st.text_input("Kelompok")
+    tanggal = st.date_input("Tanggal", value=date.today())
+    judul = st.text_input("Judul Praktik")
+    matkul = st.text_input("Mata Kuliah")
 
-st.title("🔬 Sistem Peminjaman Alat Laboratorium")
+    st.subheader("Pilih Alat")
+    alat_dipilih = [a for a in alat_list if st.checkbox(a)]
 
-# ================= DAFTAR ALAT =================
-if menu == "🏠 Daftar Alat":
-    st.subheader("📦 Katalog Alat")
-    cols = st.columns(3)
-
-    for idx, row in alat.iterrows():
-        with cols[idx % 3]:
-            st.markdown(f"### {row['nama']}")
-            st.write(row["deskripsi"])
-            st.info(f"Stok: {row['stok']}")
-
-# ================= PINJAM ALAT =================
-elif menu == "📝 Pinjam Alat":
-    st.subheader("🧾 Form Peminjaman")
-
-    nama = st.text_input("Nama Peminjam")
-    alat_pilih = st.selectbox("Pilih Alat", alat["nama"])
-    jumlah = st.number_input("Jumlah", 1, 10)
-    tgl_kembali = st.date_input("Tanggal Kembali", min_value=date.today())
-
-    if st.button("📥 Pinjam"):
-        stok = alat.loc[alat["nama"] == alat_pilih, "stok"].values[0]
-
-        if jumlah > stok:
-            st.error("Stok tidak mencukupi")
+    if st.button("Lanjutkan"):
+        if not all([nama, kelompok, judul, matkul, alat_dipilih]):
+            st.warning("Semua wajib diisi")
         else:
-            # Simpan peminjaman
-            data_baru = {
+            st.session_state.data = {
                 "nama": nama,
-                "alat": alat_pilih,
-                "jumlah": jumlah,
-                "tanggal_pinjam": date.today(),
-                "tanggal_kembali": tgl_kembali
+                "kelompok": kelompok,
+                "tanggal": tanggal,
+                "judul": judul,
+                "matkul": matkul,
+                "alat": alat_dipilih
             }
+            st.session_state.step = 2
+            st.rerun()
 
-            peminjaman = pd.concat(
-                [peminjaman, pd.DataFrame([data_baru])],
-                ignore_index=True
-            )
-            peminjaman.to_csv("data/peminjaman.csv", index=False)
+elif st.session_state.step == 2:
+    st.title("Resume")
 
-            # Update stok
-            alat.loc[alat["nama"] == alat_pilih, "stok"] -= jumlah
-            alat.to_csv("data/alat.csv", index=False)
+    d = st.session_state.data
+    st.write("Nama:", d["nama"])
+    st.write("Kelompok:", d["kelompok"])
+    st.write("Judul:", d["judul"])
+    st.write("Mata Kuliah:", d["matkul"])
 
-            st.success("✅ Peminjaman berhasil!")
+    st.subheader("Alat Dipinjam")
+    for a in d["alat"]:
+        st.write("-", a)
 
-# ================= DATA PEMINJAMAN =================
-elif menu == "📊 Data Peminjaman":
-    st.subheader("📋 Riwayat Peminjaman")
-    st.dataframe(peminjaman)
+    if st.button("Lanjutkan"):
+        st.session_state.step = 3
+        st.rerun()
+
+elif st.session_state.step == 3:
+    st.title("Upload Bukti Pengembalian")
+    foto = st.file_uploader("Upload foto", type=["jpg", "png", "jpeg"])
+
+    if foto:
+        st.image(foto)
+        if st.button("Konfirmasi"):
+            st.session_state.step = 4
+            st.rerun()
+
+elif st.session_state.step == 4:
+    with st.spinner("Memproses..."):
+        time.sleep(2)
+    st.success("✅ Pengembalian terkonfirmasi!")
+    st.balloons()
